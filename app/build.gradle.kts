@@ -2,6 +2,7 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
+    id("com.google.devtools.ksp")
 }
 
 android {
@@ -56,4 +57,27 @@ dependencies {
     androidTestImplementation(libs.androidx.ui.test.junit4)
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
+
+    //Se añaden posibles dependencias al proyecto:
+
+    // ViewModel
+    implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.9.2")
+
+    // Para usar ViewModel en Jetpack Compose
+    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.9.2")
+
+    // Compose navigation
+    implementation("androidx.navigation:navigation-compose:2.9.3")
+
+    // Iconos extendidos para Material Design
+    implementation("androidx.compose.material:material-icons-extended")
+    // ---- Room (Base de datos) ----
+    implementation("androidx.room:room-runtime:2.7.2")
+    // Para usar 'suspend' en los DAOs (Coroutines)
+    implementation("androidx.room:room-ktx:2.7.2")
+    // Procesador de anotaciones de Room (usando ksp)
+    ksp("androidx.room:room-compiler:2.7.2")
+
+    // Coil para Jetpack Compose
+    implementation("io.coil-kt.coil3:coil-compose:3.3.0")
 }
