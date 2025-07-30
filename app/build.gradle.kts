@@ -60,6 +60,9 @@ dependencies {
 
     //Se añaden posibles dependencias al proyecto:
 
+    // Soporte para coroutines en Android
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.10.2")
+
     // ViewModel
     implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.9.2")
 
