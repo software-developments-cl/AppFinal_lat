@@ -9,5 +9,8 @@ import androidx.room.PrimaryKey
 @Entity(tableName = "paseos_mascotas")
 data class EntidadPaseoMascota(
     @PrimaryKey(autoGenerate = true)
-    val id: Long = 0
+    val id: Long = 0,
+    val fecha: Long = System.currentTimeMillis(),
+    val estaPagado: Int = 0,
+    val montoTotal: Double = 0.0
 )
