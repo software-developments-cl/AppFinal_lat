@@ -3,6 +3,7 @@ package com.example.deflatam_pruebafinal.datos
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import java.util.Date // Importamos Date
 
 @Entity(tableName = "paseos_mascotas")
 data class EntidadPaseoMascota(
@@ -27,16 +28,23 @@ data class EntidadPaseoMascota(
     @ColumnInfo(name = "tarifa_por_hora")
     val tarifaPorHora: Double,
 
-    @ColumnInfo(name = "fecha_hora")
-    val fechaHora: Long, // Consider using TypeConverters for Date objects
+    @ColumnInfo(name = "fecha_hora") // Mantuvimos este campo según lo acordado
+    val fechaHora: Long,
+
+    @ColumnInfo(name = "Fecha") // Nuevo campo Fecha
+    val Fecha: Date, // Necesitará un TypeConverter
+
+    @ColumnInfo(name = "EstaPagado") // Nuevo campo EstaPagado
+    val EstaPagado: Boolean,
+
+    @ColumnInfo(name = "MontoTotal") // Nuevo campo MontoTotal
+    val MontoTotal: Double,
 
     @ColumnInfo(name = "notas_adicionales")
     val notasAdicionales: String?
 ) {
-    // Puedes añadir una propiedad calculada para costoTotal si lo necesitas aquí,
-    // asegurándote de anotarla con @Ignore para que Room no intente mapearla a una columna.
-    // Ejemplo:
-    // @Ignore
-    // val costoTotal: Double
-    //     get() = duracionPaseoHoras * tarifaPorHora
+    // La propiedad calculada para costoTotal (anteriormente sugerida con @Ignore)
+    // ahora se almacena directamente como MontoTotal en la base de datos.
+    // El cálculo de MontoTotal (duracionPaseoHoras * tarifaPorHora)
+    // se deberá realizar antes de guardar o actualizar la entidad.
 }
