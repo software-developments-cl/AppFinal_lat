@@ -7,4 +7,3 @@ fun FormatoDinero(valor: Double): String {
     val formato = NumberFormat.getNumberInstance(Locale("es", "CL"))  // Formato chileno
     return "$${formato.format(valor)}"
 }
-

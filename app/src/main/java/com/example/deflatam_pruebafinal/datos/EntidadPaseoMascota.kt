@@ -5,8 +5,6 @@ import androidx.room.PrimaryKey
 import java.util.Date
 
 //Entidad mientras construyen este archivo. para que no me de error
-
-
 @Entity(tableName = "paseos_mascotas")
 data class EntidadPaseoMascota(
     @PrimaryKey(autoGenerate = true)

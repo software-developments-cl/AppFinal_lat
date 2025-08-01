@@ -9,5 +9,3 @@ fun FormatoFecha(fecha: Date): String {
     val formato = SimpleDateFormat("dd/MM/yyyy", Locale("es", "CL"))
     return formato.format(fecha)
 }
-
-
