@@ -12,5 +12,10 @@ object FormatoFecha{
         return formato.format(fecha)
     }
 
+
+    fun formatearFechaHora(fecha: Date): String {
+        val formato = SimpleDateFormat("dd/MM/yyyy - HH:mm", Locale("es", "CL"))
+        return formato.format(fecha)
+    }
 }
 
