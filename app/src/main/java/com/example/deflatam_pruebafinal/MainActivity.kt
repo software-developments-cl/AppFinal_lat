@@ -52,6 +52,8 @@ fun AplicacionPaseosMascotas() {
     var mostrandoFormulario by remember { mutableStateOf(false) }
     var mostrandoBusqueda by remember { mutableStateOf(false) }
 
+
+
     Scaffold(
         topBar = {
             TopAppBar(
@@ -231,7 +233,7 @@ fun FormularioNuevoPaseo(
             OutlinedTextField(
                 value = nombreMascota,
                 onValueChange = viewModel::actualizarNombreMascota,
-                label = { Text("🐕 Nombre de la mascota") },
+                label = { Text("🐕 Ingresa el nombre de tu mascota") },
                 modifier = Modifier.fillMaxWidth()
             )
 
@@ -277,7 +279,7 @@ fun FormularioNuevoPaseo(
             OutlinedTextField(
                 value = nombreCliente,
                 onValueChange = viewModel::actualizarNombreCliente,
-                label = { Text("👤 Nombre del cliente") },
+                label = { Text("👤 Ingresa el nombre del cliente") },
                 modifier = Modifier.fillMaxWidth()
             )
 
@@ -360,7 +362,7 @@ fun FormularioNuevoPaseo(
                 )
                 Spacer(modifier = Modifier.width(8.dp))
                 Text(
-                    text = "💾 Guardar Paseo",
+                    text = "💾 Guardemos el Paseo",
                     style = MaterialTheme.typography.bodyLarge,
                     fontWeight = FontWeight.Bold
                 )
@@ -379,7 +381,7 @@ fun ListaDePaseos(viewModel: ModeloVistaPaseos) {
     val paseos by viewModel.paseos.collectAsState()
 
     Text(
-        text = "📋 Lista de Paseos",
+        text = "📋 Aquí tienes la ista de Paseos",
         style = MaterialTheme.typography.headlineSmall,
         fontWeight = FontWeight.Bold
     )
@@ -403,7 +405,7 @@ fun ListaDePaseos(viewModel: ModeloVistaPaseos) {
                     style = MaterialTheme.typography.displayLarge
                 )
                 Text(
-                    text = "No hay paseos registrados",
+                    text = "No hay ningún paseo registrado",
                     style = MaterialTheme.typography.bodyLarge
                 )
                 Text(
@@ -550,7 +552,7 @@ fun TarjetaPaseo(
                         modifier = Modifier.size(16.dp)
                     )
                     Spacer(modifier = Modifier.width(4.dp))
-                    Text("Eliminar")
+                    Text("⚠ Eliminar")
                 }
             }
         }
@@ -573,7 +575,7 @@ fun FormularioBusquedaPaseos(
             .verticalScroll(rememberScrollState())
     ) {
         Text(
-            text = "🔍 Buscar Paseos por Cliente",
+            text = "➵ 🔍 Buscar Paseos por Cliente",
             style = MaterialTheme.typography.headlineSmall,
             fontWeight = FontWeight.Bold
         )
@@ -586,7 +588,7 @@ fun FormularioBusquedaPaseos(
                 nombreBusqueda = it
                 viewModel.buscarPaseosPorNombreCliente(it)
             },
-            label = { Text("Nombre del cliente") },
+            label = { Text("➵ Nombre del cliente") },
             modifier = Modifier.fillMaxWidth(),
             singleLine = true
         )
@@ -637,3 +639,5 @@ fun obtenerEmojiTipo(tipo: String): String {
         else -> "🐾"
     }
 }
+
+
