@@ -44,14 +44,13 @@ class MainActivity : ComponentActivity() {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AplicacionPaseosMascotas() {
-    // Configurar la base de datos y el ViewModel
     val context = LocalContext.current
     val baseDeDatos = BaseDeDatosPaseos.obtenerBaseDeDatos(context)
     val repositorio = RepositorioPaseosMascotas(baseDeDatos.accesoDatosPaseos())
     val viewModel: ModeloVistaPaseos = viewModel { ModeloVistaPaseos(repositorio) }
 
-    // Estado para mostrar/ocultar el formulario
     var mostrandoFormulario by remember { mutableStateOf(false) }
+    var mostrandoBusqueda by remember { mutableStateOf(false) }
 
     Scaffold(
         topBar = {
@@ -63,13 +62,29 @@ fun AplicacionPaseosMascotas() {
             )
         },
         floatingActionButton = {
-            FloatingActionButton(
-                onClick = { mostrandoFormulario = !mostrandoFormulario }
+            Column(
+                verticalArrangement = Arrangement.spacedBy(12.dp),
+                horizontalAlignment = Alignment.End,
+                modifier = Modifier.padding(bottom = 16.dp, end = 16.dp)
             ) {
-                Icon(
-                    imageVector = if (mostrandoFormulario) Icons.Default.Close else Icons.Default.Add,
-                    contentDescription = if (mostrandoFormulario) "Cerrar" else "Agregar paseo"
-                )
+                FloatingActionButton(
+                    onClick = { mostrandoFormulario = !mostrandoFormulario },
+                    containerColor = MaterialTheme.colorScheme.primary
+                ) {
+                    Icon(
+                        imageVector = if (mostrandoFormulario) Icons.Default.Close else Icons.Default.Add,
+                        contentDescription = if (mostrandoFormulario) "Cerrar formulario" else "Agregar paseo"
+                    )
+                }
+                FloatingActionButton(
+                    onClick = { mostrandoBusqueda = !mostrandoBusqueda },
+                    containerColor = MaterialTheme.colorScheme.secondary
+                ) {
+                    Icon(
+                        imageVector = if (mostrandoBusqueda) Icons.Default.Close else Icons.Default.Search,
+                        contentDescription = if (mostrandoBusqueda) "Cerrar búsqueda" else "Buscar paseo"
+                    )
+                }
             }
         }
     ) { paddingValues ->
@@ -79,23 +94,23 @@ fun AplicacionPaseosMascotas() {
                 .padding(paddingValues)
                 .padding(16.dp)
         ) {
-            // Mostrar estadísticas de dinero
             EstadisticasCard(viewModel)
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            if (mostrandoFormulario) {
-                // Mostrar formulario para agregar nuevo paseo (CON SCROLL)
-                FormularioNuevoPaseo(viewModel) {
+            when {
+                mostrandoFormulario -> FormularioNuevoPaseo(viewModel) {
                     mostrandoFormulario = false
                 }
-            } else {
-                // Mostrar lista de todos los paseos
-                ListaDePaseos(viewModel)
+                mostrandoBusqueda -> FormularioBusquedaPaseos(viewModel) {
+                    mostrandoBusqueda = false
+                }
+                else -> ListaDePaseos(viewModel)
             }
         }
     }
 }
+
 
 // Tarjeta que muestra las estadísticas de dinero
 @Composable
@@ -538,6 +553,76 @@ fun TarjetaPaseo(
                     Text("Eliminar")
                 }
             }
+        }
+    }
+}
+
+
+@Composable
+fun FormularioBusquedaPaseos(
+    viewModel: ModeloVistaPaseos,
+    onCerrarBusqueda: () -> Unit
+) {
+    var nombreBusqueda by remember { mutableStateOf("") }
+    val listaFiltrada by viewModel.listaPaseosFiltrada.collectAsState()
+
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(16.dp)
+            .verticalScroll(rememberScrollState())
+    ) {
+        Text(
+            text = "🔍 Buscar Paseos por Cliente",
+            style = MaterialTheme.typography.headlineSmall,
+            fontWeight = FontWeight.Bold
+        )
+
+        Spacer(modifier = Modifier.height(12.dp))
+
+        OutlinedTextField(
+            value = nombreBusqueda,
+            onValueChange = {
+                nombreBusqueda = it
+                viewModel.buscarPaseosPorNombreCliente(it)
+            },
+            label = { Text("Nombre del cliente") },
+            modifier = Modifier.fillMaxWidth(),
+            singleLine = true
+        )
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        if (nombreBusqueda.isBlank()) {
+            Text("Ingresa un nombre para buscar paseos.", style = MaterialTheme.typography.bodyMedium)
+        } else {
+            if (listaFiltrada.isEmpty()) {
+                Text("No se encontraron paseos.", style = MaterialTheme.typography.bodyMedium)
+            } else {
+                LazyColumn(
+                    verticalArrangement = Arrangement.spacedBy(8.dp),
+                    modifier = Modifier.heightIn(max = 300.dp)
+                ) {
+                    items(listaFiltrada) { paseo ->
+                        TarjetaPaseo(
+                            paseo = paseo,
+                            onCambiarEstadoPago = { viewModel.cambiarEstadoPago(paseo) },
+                            onEliminar = { viewModel.eliminarPaseo(paseo) }
+                        )
+                    }
+                }
+            }
+        }
+
+
+
+        Spacer(modifier = Modifier.height(12.dp))
+
+        Button(
+            onClick = onCerrarBusqueda,
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Text("Cerrar búsqueda")
         }
     }
 }
