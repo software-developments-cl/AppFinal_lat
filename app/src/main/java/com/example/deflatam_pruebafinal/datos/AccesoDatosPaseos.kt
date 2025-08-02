@@ -44,4 +44,9 @@ interface AccesoDatosPaseos {
     /** Calcular el dinero pendiente de cobro (paseos no pagados)*/
     @Query("SELECT SUM(montoTotal) FROM paseos_mascotas WHERE estaPagado = 0")
     fun getTotalPendiente(): Flow<Double?>
+
+    /** Buscar clientes por nombre (puede ser parte del nombre)*/
+    @Query("SELECT * FROM paseos_mascotas WHERE nombreCliente LIKE '%' || :nombreCliente || '%'")
+    fun buscarPaseosPorNombreCliente(nombreCliente: String): Flow<List<EntidadPaseoMascota>>
+
 }

@@ -48,5 +48,9 @@ class RepositorioPaseosMascotas(private val accesoDatosPaseos: AccesoDatosPaseos
     fun obtenerTotalPendiente(): Flow<Double?> {
         return accesoDatosPaseos.getTotalPendiente()
     }
+
+    fun buscarPaseosPorNombreCliente(nombreCliente: String): Flow<List<EntidadPaseoMascota>> {
+        return accesoDatosPaseos.buscarPaseosPorNombreCliente(nombreCliente)
+    }
 }
 

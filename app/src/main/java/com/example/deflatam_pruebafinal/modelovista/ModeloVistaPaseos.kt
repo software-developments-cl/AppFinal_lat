@@ -9,6 +9,8 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import java.util.Date
+import kotlinx.coroutines.flow.collect
+
 
 // El ViewModel es como el "cerebro" de la aplicación
 // Maneja toda la lógica y conecta la interfaz con los datos
@@ -42,6 +44,9 @@ class ModeloVistaPaseos(private val repositorio: RepositorioPaseosMascotas) : Vi
 
     private val _notas = MutableStateFlow("")
     val notas: StateFlow<String> = _notas.asStateFlow()
+
+    private val _listaPaseosFiltrada  = MutableStateFlow<List<EntidadPaseoMascota>>(emptyList())
+    val listaPaseosFiltrada: StateFlow<List<EntidadPaseoMascota>> = _listaPaseosFiltrada
 
     init {
         // Cuando se crea el ViewModel, cargar todos los datos
@@ -164,5 +169,14 @@ class ModeloVistaPaseos(private val repositorio: RepositorioPaseosMascotas) : Vi
                 _duracionHoras.value.toDoubleOrNull() != null &&
                 _tarifaPorHora.value.toDoubleOrNull() != null
     }
+
+    fun buscarPaseosPorNombreCliente(nombreCliente: String) {
+        viewModelScope.launch {
+            repositorio.buscarPaseosPorNombreCliente(nombreCliente).collect { lista ->
+                _listaPaseosFiltrada.value = lista
+            }
+        }
+    }
+
 }
 
