@@ -459,7 +459,7 @@ fun TarjetaPaseo(
 
                     // Fecha del paseo
                     Text(
-                        text = "📅 ${FormatoFecha(paseo.fecha)}",
+                        text = "📅 ${FormatoFecha.formatearFecha(paseo.fecha)}",
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )

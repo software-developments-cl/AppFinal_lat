@@ -4,10 +4,13 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
-// Formatear fecha en formato dd/mm/yyyy
-fun FormatoFecha(fecha: Date): String {
-    val formato = SimpleDateFormat("dd/MM/yyyy", Locale("es", "CL"))
-    return formato.format(fecha)
-}
+object FormatoFecha{
 
+
+    fun formatearFecha(fecha: Date): String {
+        val formato = SimpleDateFormat("d 'de' MMMM 'de' yyyy", Locale("es", "CL"))
+        return formato.format(fecha)
+    }
+
+}
 
