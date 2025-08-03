@@ -425,9 +425,9 @@ fun TarjetaPaseo(
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
         colors = CardDefaults.cardColors(
             containerColor = if (paseo.estaPagado) {
-                Color(0xFFE8F5E8)
+                Color(0xFFE8F5E8) // Verde claro para pagado
             } else {
-                Color(0xFFFFF3E0)
+                Color(0xFFFFF3E0) // Amarillo claro para pendiente
             }
         )
     ) {
@@ -440,7 +440,7 @@ fun TarjetaPaseo(
                 verticalAlignment = Alignment.Top
             ) {
                 Column(
-                    modifier = Modifier.weight(1f) // Esto estaba incluso en la versión anterior exitosa
+                    modifier = Modifier.weight(1f)
                 ) {
                     Text(
                         text = "${obtenerEmojiTipo(paseo.tipoMascota)} ${paseo.nombreMascota}",
@@ -450,12 +450,12 @@ fun TarjetaPaseo(
                     Text(
                         text = "👤 ${paseo.nombreCliente}",
                         style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                        color = Color(0xFF2f3030) // <--- CAMBIO AQUÍ
                     )
                     Text(
-                        text = "📅 ${FormatoFecha(paseo.fecha)}", // Asumo que FormatoFecha está OK
+                        text = "📅 ${FormatoFecha(paseo.fecha)}",
                         style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                        color = Color(0xFF2f3030) // <--- CAMBIO AQUÍ
                     )
                 }
                 AssistChip(
@@ -487,7 +487,6 @@ fun TarjetaPaseo(
                     style = MaterialTheme.typography.bodyMedium
                 )
                 Text(
-                    // Usando la versión que me confirmaste que funciona y es correcta para Double
                     text = "${FormatoDinero.enteroAStringDineroChileno(paseo.tarifaPorHora.toInt())}/h",
                     style = MaterialTheme.typography.bodyMedium
                 )
@@ -504,7 +503,7 @@ fun TarjetaPaseo(
                 Text(
                     text = "📝 ${paseo.notas}",
                     style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                    color = Color(0xFF2f3030) // <--- CAMBIO AQUÍ
                 )
             }
 
@@ -540,5 +539,4 @@ fun obtenerEmojiTipo(tipo: String): String {
         else -> "🐾"
     }
 }
-
 
