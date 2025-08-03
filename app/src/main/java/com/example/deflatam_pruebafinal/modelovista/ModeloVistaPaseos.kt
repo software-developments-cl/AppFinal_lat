@@ -86,11 +86,26 @@ class ModeloVistaPaseos(private val repositorio: RepositorioPaseosMascotas) : Vi
     }
 
     fun actualizarDuracionHoras(duracion: String) {
-        _duracionHoras.value = duracion
+        // Permitir solo números y limitar a 9 caracteres
+        val duracionFiltrada = duracion.filter { it.isDigit() }
+        if (duracionFiltrada.length <= 9) {
+            _duracionHoras.value = duracionFiltrada
+        } else {
+            // Opcional: si excede, se trunca a 9. O podrías no hacer nada
+            // y mantener el valor anterior o el valor truncado.
+             _duracionHoras.value = duracionFiltrada.take(9)
+        }
     }
 
     fun actualizarTarifaPorHora(tarifa: String) {
-        _tarifaPorHora.value = tarifa
+        // Permitir solo números y limitar a 9 caracteres
+        val tarifaFiltrada = tarifa.filter { it.isDigit() }
+        if (tarifaFiltrada.length <= 9) {
+            _tarifaPorHora.value = tarifaFiltrada
+        } else {
+            // Opcional: si excede, se trunca a 9.
+            _tarifaPorHora.value = tarifaFiltrada.take(9)
+        }
     }
 
     fun actualizarNotas(notas: String) {
@@ -165,4 +180,3 @@ class ModeloVistaPaseos(private val repositorio: RepositorioPaseosMascotas) : Vi
                 _tarifaPorHora.value.toDoubleOrNull() != null
     }
 }
-

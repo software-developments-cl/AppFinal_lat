@@ -5,6 +5,8 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.*
+// Import necesario para KeyboardOptions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
@@ -18,6 +20,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
+// Import necesario para KeyboardType
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.deflatam_pruebafinal.datos.BaseDeDatosPaseos
@@ -278,7 +282,9 @@ fun FormularioNuevoPaseo(
                     value = duracionHoras,
                     onValueChange = viewModel::actualizarDuracionHoras,
                     label = { Text("⏱️ Horas") },
-                    modifier = Modifier.weight(1f)
+                    modifier = Modifier.weight(1f),
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number), // <--- AÑADIDO
+                    singleLine = true // <--- AÑADIDO
                 )
 
                 // Tarifa por hora
@@ -286,7 +292,9 @@ fun FormularioNuevoPaseo(
                     value = tarifaPorHora,
                     onValueChange = viewModel::actualizarTarifaPorHora,
                     label = { Text("💵 Tarifa/hora") },
-                    modifier = Modifier.weight(1f)
+                    modifier = Modifier.weight(1f),
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number), // <--- AÑADIDO
+                    singleLine = true // <--- AÑADIDO
                 )
             }
 
@@ -552,3 +560,4 @@ fun obtenerEmojiTipo(tipo: String): String {
         else -> "🐾"
     }
 }
+
