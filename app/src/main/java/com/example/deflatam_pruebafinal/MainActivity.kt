@@ -381,7 +381,7 @@ fun ListaDePaseos(viewModel: ModeloVistaPaseos) {
     val paseos by viewModel.paseos.collectAsState()
 
     Text(
-        text = "📋 Aquí tienes la ista de Paseos",
+        text = "📋 Aquí tienes la lista de Paseos",
         style = MaterialTheme.typography.headlineSmall,
         fontWeight = FontWeight.Bold
     )
