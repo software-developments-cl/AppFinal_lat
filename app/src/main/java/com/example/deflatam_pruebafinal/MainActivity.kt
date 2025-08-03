@@ -1,4 +1,3 @@
-
 package com.example.deflatam_pruebafinal
 
 import android.os.Bundle
@@ -127,63 +126,68 @@ fun EstadisticasCard(viewModel: ModeloVistaPaseos) {
 
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween
+                horizontalArrangement = Arrangement.SpaceBetween // Se mantiene SpaceBetween, weight se encargará del espaciado
             ) {
                 // Dinero ya ganado (pagado)
                 Column(
-                    // SIN PESO (como estaba antes del último intento)
+                    modifier = Modifier.weight(1f), // <--- CAMBIO AQUÍ
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     Text(
                         text = "💰 Ganado",
-                        style = MaterialTheme.typography.bodyMedium
-                        // SIN maxLines ni overflow (como estaba antes)
+                        style = MaterialTheme.typography.bodyMedium,
+                        maxLines = 1, // <--- CAMBIO AQUÍ
+                        overflow = TextOverflow.Ellipsis // <--- CAMBIO AQUÍ
                     )
                     Text(
-                        // Usando la versión de FormatoDinero que me confirmaste que funciona
                         text = FormatoDinero.enteroAStringDineroChileno(totalGanado.toInt()),
                         style = MaterialTheme.typography.headlineSmall,
                         color = Color(0xFF4CAF50),
-                        fontWeight = FontWeight.Bold
-                        // SIN maxLines ni overflow (como estaba antes)
+                        fontWeight = FontWeight.Bold,
+                        maxLines = 1, // <--- CAMBIO AQUÍ
+                        overflow = TextOverflow.Ellipsis // <--- CAMBIO AQUÍ
                     )
                 }
 
                 // Dinero pendiente de cobro
                 Column(
-                    // SIN PESO
+                    modifier = Modifier.weight(1f), // <--- CAMBIO AQUÍ
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     Text(
                         text = "⏳ Pendiente",
-                        style = MaterialTheme.typography.bodyMedium
-                        // SIN maxLines ni overflow
+                        style = MaterialTheme.typography.bodyMedium,
+                        maxLines = 1, // <--- CAMBIO AQUÍ
+                        overflow = TextOverflow.Ellipsis // <--- CAMBIO AQUÍ
                     )
                     Text(
                         text = FormatoDinero.enteroAStringDineroChileno(totalPendiente.toInt()),
                         style = MaterialTheme.typography.headlineSmall,
                         color = Color(0xFFFF9800),
-                        fontWeight = FontWeight.Bold
-                        // SIN maxLines ni overflow
+                        fontWeight = FontWeight.Bold,
+                        maxLines = 1, // <--- CAMBIO AQUÍ
+                        overflow = TextOverflow.Ellipsis // <--- CAMBIO AQUÍ
                     )
                 }
 
                 // Total general
                 Column(
-                    // SIN PESO
+                    modifier = Modifier.weight(1f), // <--- CAMBIO AQUÍ
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     Text(
                         text = "💵 Total",
-                        style = MaterialTheme.typography.bodyMedium
-                        // SIN maxLines ni overflow
+                        style = MaterialTheme.typography.bodyMedium,
+                        maxLines = 1, // <--- CAMBIO AQUÍ
+                        overflow = TextOverflow.Ellipsis // <--- CAMBIO AQUÍ
                     )
                     Text(
                         text = FormatoDinero.enteroAStringDineroChileno((totalGanado + totalPendiente).toInt()),
                         style = MaterialTheme.typography.headlineSmall,
                         color = MaterialTheme.colorScheme.primary,
-                        fontWeight = FontWeight.Bold
-                        // SIN maxLines ni overflow
+                        fontWeight = FontWeight.Bold,
+                        maxLines = 1, // <--- CAMBIO AQUÍ
+                        overflow = TextOverflow.Ellipsis // <--- CAMBIO AQUÍ
                     )
                 }
             }
@@ -425,9 +429,9 @@ fun TarjetaPaseo(
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
         colors = CardDefaults.cardColors(
             containerColor = if (paseo.estaPagado) {
-                Color(0xFFE8F5E8)
+                Color(0xFFE8F5E8) // Verde claro para pagado
             } else {
-                Color(0xFFFFF3E0)
+                Color(0xFFFFF3E0) // Amarillo claro para pendiente
             }
         )
     ) {
@@ -440,22 +444,23 @@ fun TarjetaPaseo(
                 verticalAlignment = Alignment.Top
             ) {
                 Column(
-                    modifier = Modifier.weight(1f) // Esto estaba incluso en la versión anterior exitosa
+                    modifier = Modifier.weight(1f)
                 ) {
                     Text(
                         text = "${obtenerEmojiTipo(paseo.tipoMascota)} ${paseo.nombreMascota}",
                         style = MaterialTheme.typography.headlineSmall,
                         fontWeight = FontWeight.Bold
+                        // Color predeterminado (se adaptará al tema o usará uno explícito si se define)
                     )
                     Text(
                         text = "👤 ${paseo.nombreCliente}",
                         style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                        color = Color(0xFF2f3030) // Color específico #2f3030
                     )
                     Text(
-                        text = "📅 ${FormatoFecha(paseo.fecha)}", // Asumo que FormatoFecha está OK
+                        text = "📅 ${FormatoFecha(paseo.fecha)}",
                         style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                        color = Color(0xFF2f3030) // Color específico #2f3030
                     )
                 }
                 AssistChip(
@@ -467,11 +472,11 @@ fun TarjetaPaseo(
                     },
                     colors = AssistChipDefaults.assistChipColors(
                         containerColor = if (paseo.estaPagado) {
-                            Color(0xFF4CAF50)
+                            Color(0xFF4CAF50) // Verde para el chip pagado
                         } else {
-                            Color(0xFFFF9800)
+                            Color(0xFFFF9800) // Naranja para el chip pendiente
                         },
-                        labelColor = Color.White
+                        labelColor = Color.White // Texto del chip siempre blanco para contraste
                     )
                 )
             }
@@ -485,17 +490,18 @@ fun TarjetaPaseo(
                 Text(
                     text = "⏱️ ${paseo.duracionHoras}h",
                     style = MaterialTheme.typography.bodyMedium
+                    // Color predeterminado
                 )
                 Text(
-                    // Usando la versión que me confirmaste que funciona y es correcta para Double
                     text = "${FormatoDinero.enteroAStringDineroChileno(paseo.tarifaPorHora.toInt())}/h",
                     style = MaterialTheme.typography.bodyMedium
+                    // Color predeterminado
                 )
                 Text(
                     text = "💰 ${FormatoDinero.enteroAStringDineroChileno(paseo.montoTotal.toInt())}",
                     style = MaterialTheme.typography.bodyMedium,
                     fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.primary
+                    color = MaterialTheme.colorScheme.primary // Color primario del tema
                 )
             }
 
@@ -504,7 +510,7 @@ fun TarjetaPaseo(
                 Text(
                     text = "📝 ${paseo.notas}",
                     style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                    color = Color(0xFF2f3030) // Color específico #2f3030
                 )
             }
 
@@ -516,7 +522,7 @@ fun TarjetaPaseo(
                 TextButton(
                     onClick = onEliminar,
                     colors = ButtonDefaults.textButtonColors(
-                        contentColor = Color(0xFFD32F2F)
+                        contentColor = Color(0xFFD32F2F) // Rojo para el botón de eliminar
                     )
                 ) {
                     Icon(
@@ -540,5 +546,3 @@ fun obtenerEmojiTipo(tipo: String): String {
         else -> "🐾"
     }
 }
-
-
