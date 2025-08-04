@@ -1,4 +1,3 @@
-
 package com.example.deflatam_pruebafinal
 
 import android.os.Bundle
@@ -31,6 +30,7 @@ import com.example.deflatam_pruebafinal.datos.BaseDeDatosPaseos
 import com.example.deflatam_pruebafinal.datos.EntidadPaseoMascota
 import com.example.deflatam_pruebafinal.modelovista.ModeloVistaPaseos
 import com.example.deflatam_pruebafinal.repositorio.RepositorioPaseosMascotas
+import com.example.deflatam_pruebafinal.ui.theme.Black
 import com.example.deflatam_pruebafinal.ui.theme.DefLatam_pruebaFinalTheme
 import com.example.deflatam_pruebafinal.utilidades.FormatoDinero // Usaremos la versión que me confirmaste que funciona
 import com.example.deflatam_pruebafinal.utilidades.FormatoFecha
@@ -445,7 +445,8 @@ fun TarjetaPaseo(
                     Text(
                         text = "${obtenerEmojiTipo(paseo.tipoMascota)} ${paseo.nombreMascota}",
                         style = MaterialTheme.typography.headlineSmall,
-                        fontWeight = FontWeight.Bold
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.primary
                     )
                     Text(
                         text = "👤 ${paseo.nombreCliente}",
@@ -484,11 +485,15 @@ fun TarjetaPaseo(
             ) {
                 Text(
                     text = "⏱️ ${paseo.duracionHoras}h",
-                    style = MaterialTheme.typography.bodyMedium
+                    style = MaterialTheme.typography.bodyMedium,
+                    fontWeight = FontWeight.Bold,
+                    color = Black
                 )
                 Text(
                     text = "${FormatoDinero.enteroAStringDineroChileno(paseo.tarifaPorHora.toInt())}/h",
-                    style = MaterialTheme.typography.bodyMedium
+                    style = MaterialTheme.typography.bodyMedium,
+                    fontWeight = FontWeight.Bold,
+                    color = Black
                 )
                 Text(
                     text = "💰 ${FormatoDinero.enteroAStringDineroChileno(paseo.montoTotal.toInt())}",
