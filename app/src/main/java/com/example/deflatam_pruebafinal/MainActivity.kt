@@ -1,5 +1,6 @@
 package com.example.deflatam_pruebafinal
 
+import android.content.Context
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -59,6 +60,8 @@ fun AplicacionPaseosMascotas() {
 
     // Estado para mostrar/ocultar el formulario
     var mostrandoFormulario by remember { mutableStateOf(false) }
+    // Obtener el término de búsqueda actual del ViewModel
+    val terminoBusqueda by viewModel.terminoBusqueda.collectAsState()
 
     Scaffold(
         topBar = {
@@ -91,13 +94,25 @@ fun AplicacionPaseosMascotas() {
 
             Spacer(modifier = Modifier.height(16.dp))
 
+            // Campo de búsqueda
+            OutlinedTextField(
+                value = terminoBusqueda,
+                onValueChange = { viewModel.actualizarTerminoBusqueda(it) },
+                label = { Text("🔍 Buscar por nombre de cliente") },
+                modifier = Modifier.fillMaxWidth(),
+                singleLine = true,
+                leadingIcon = { Icon(Icons.Default.Search, contentDescription = "Buscar") }
+            )
+
+            Spacer(modifier = Modifier.height(16.dp))
+
             if (mostrandoFormulario) {
                 // Mostrar formulario para agregar nuevo paseo (CON SCROLL)
-                FormularioNuevoPaseo(viewModel) {
-                    mostrandoFormulario = false
-                }
+                FormularioNuevoPaseo(viewModel,
+                    onPaseoAgregado = {mostrandoFormulario = false}
+                )
             } else {
-                // Mostrar lista de todos los paseos
+                // Mostrar lista de todos los paseos (ya se filtrará automáticamente por el ViewModel)
                 ListaDePaseos(viewModel)
             }
         }
@@ -197,7 +212,8 @@ fun EstadisticasCard(viewModel: ModeloVistaPaseos) {
 @Composable
 fun FormularioNuevoPaseo(
     viewModel: ModeloVistaPaseos,
-    onPaseoAgregado: () -> Unit
+    onPaseoAgregado: () -> Unit,
+    context: Context = LocalContext.current
 ) {
     val nombreMascota by viewModel.nombreMascota.collectAsState()
     val tipoMascota by viewModel.tipoMascota.collectAsState()
@@ -334,7 +350,7 @@ fun FormularioNuevoPaseo(
 
             Button(
                 onClick = {
-                    viewModel.agregarPaseo()
+                    viewModel.agregarPaseo(context)
                     onPaseoAgregado()
                 },
                 enabled = viewModel.formularioEsValido(),
@@ -363,15 +379,21 @@ fun FormularioNuevoPaseo(
 }
 
 @Composable
-fun ListaDePaseos(viewModel: ModeloVistaPaseos) {
+fun ListaDePaseos(viewModel: ModeloVistaPaseos,
+                  context: Context = LocalContext.current) {
     val paseos by viewModel.paseos.collectAsState()
 
-    Text(
-        text = "📋 Lista de Paseos",
-        style = MaterialTheme.typography.headlineSmall,
-        fontWeight = FontWeight.Bold
-    )
-    Spacer(modifier = Modifier.height(8.dp))
+    // Título de la lista, se puede ocultar si la lista está vacía y el campo de búsqueda está activo
+    // o si prefieres mostrar el mensaje "No hay paseos" directamente.
+    val terminoBusqueda by viewModel.terminoBusqueda.collectAsState()
+    if (paseos.isNotEmpty() || terminoBusqueda.isBlank()) {
+        Text(
+            text = "📋 Lista de Paseos",
+            style = MaterialTheme.typography.headlineSmall,
+            fontWeight = FontWeight.Bold
+        )
+        Spacer(modifier = Modifier.height(8.dp))
+    }
 
     if (paseos.isEmpty()) {
         Card(
@@ -388,15 +410,22 @@ fun ListaDePaseos(viewModel: ModeloVistaPaseos) {
                     text = "🐕",
                     style = MaterialTheme.typography.displayLarge
                 )
-                Text(
-                    text = "No hay paseos registrados",
-                    style = MaterialTheme.typography.bodyLarge
-                )
-                Text(
-                    text = "¡Agrega tu primer paseo con el botón +!",
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
+                if (terminoBusqueda.isNotBlank()) {
+                    Text(
+                        text = "No se encontraron paseos para \"$terminoBusqueda\"",
+                        style = MaterialTheme.typography.bodyLarge
+                    )
+                } else {
+                    Text(
+                        text = "No hay paseos registrados",
+                        style = MaterialTheme.typography.bodyLarge
+                    )
+                    Text(
+                        text = "¡Agrega tu primer paseo con el botón +!",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
             }
         }
     } else {
@@ -407,7 +436,7 @@ fun ListaDePaseos(viewModel: ModeloVistaPaseos) {
                 TarjetaPaseo(
                     paseo = paseo,
                     onCambiarEstadoPago = { viewModel.cambiarEstadoPago(paseo) },
-                    onEliminar = { viewModel.eliminarPaseo(paseo) }
+                    onEliminar = { viewModel.eliminarPaseo(paseo, context) }
                 )
             }
         }

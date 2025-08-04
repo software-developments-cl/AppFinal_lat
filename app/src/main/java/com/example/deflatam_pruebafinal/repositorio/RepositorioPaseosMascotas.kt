@@ -25,8 +25,9 @@ class RepositorioPaseosMascotas(private val accesoDatosPaseos: AccesoDatosPaseos
     }
 
     // Agregar un nuevo paseo a la base de datos
-    suspend fun agregarPaseo(paseo: EntidadPaseoMascota) {
+    suspend fun agregarPaseo(paseo: EntidadPaseoMascota): EntidadPaseoMascota {
         accesoDatosPaseos.insertarPaseo(paseo)
+        return  paseo
     }
 
     // Actualizar un paseo (por ejemplo, marcarlo como pagado)
