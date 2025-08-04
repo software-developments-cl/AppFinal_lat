@@ -1,5 +1,6 @@
 package com.example.deflatam_pruebafinal
 
+import android.content.Context
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -93,9 +94,9 @@ fun AplicacionPaseosMascotas() {
 
             if (mostrandoFormulario) {
                 // Mostrar formulario para agregar nuevo paseo (CON SCROLL)
-                FormularioNuevoPaseo(viewModel) {
-                    mostrandoFormulario = false
-                }
+                FormularioNuevoPaseo(viewModel,
+                    onPaseoAgregado = {mostrandoFormulario = false}
+                )
             } else {
                 // Mostrar lista de todos los paseos
                 ListaDePaseos(viewModel)
@@ -197,7 +198,8 @@ fun EstadisticasCard(viewModel: ModeloVistaPaseos) {
 @Composable
 fun FormularioNuevoPaseo(
     viewModel: ModeloVistaPaseos,
-    onPaseoAgregado: () -> Unit
+    onPaseoAgregado: () -> Unit,
+    context: Context = LocalContext.current
 ) {
     val nombreMascota by viewModel.nombreMascota.collectAsState()
     val tipoMascota by viewModel.tipoMascota.collectAsState()
@@ -334,7 +336,7 @@ fun FormularioNuevoPaseo(
 
             Button(
                 onClick = {
-                    viewModel.agregarPaseo()
+                    viewModel.agregarPaseo(context)
                     onPaseoAgregado()
                 },
                 enabled = viewModel.formularioEsValido(),
@@ -363,7 +365,8 @@ fun FormularioNuevoPaseo(
 }
 
 @Composable
-fun ListaDePaseos(viewModel: ModeloVistaPaseos) {
+fun ListaDePaseos(viewModel: ModeloVistaPaseos,
+                  context: Context = LocalContext.current) {
     val paseos by viewModel.paseos.collectAsState()
 
     Text(
@@ -407,7 +410,7 @@ fun ListaDePaseos(viewModel: ModeloVistaPaseos) {
                 TarjetaPaseo(
                     paseo = paseo,
                     onCambiarEstadoPago = { viewModel.cambiarEstadoPago(paseo) },
-                    onEliminar = { viewModel.eliminarPaseo(paseo) }
+                    onEliminar = { viewModel.eliminarPaseo(paseo, context) }
                 )
             }
         }
