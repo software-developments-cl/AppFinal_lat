@@ -1,8 +1,8 @@
 # Control de Paseos de Mascotas
 
 # 📱 App Final Latam 
-Descarga la app aquí (Solo para testing, app no viable para publicación)
-https://www.dropbox.com/scl/fi/ly11l6vykve1f2tzq26ey/AppPaseosADLKotlin.rar?rlkey=datzlr6gviv778lyyedbrx08x&st=7rpczzyx&dl=0
+Descarga la app aquí (Solo para testing, app no viable para publicación): 
+https://www.dropbox.com/scl/fi/3j6aorygqh8g6b26ysk0m/app-debug.apk?rlkey=7y181cnram4buq93vpj113e7g&st=j80jw5za&dl=0
 
 # 📖 Descripción
 Ejercicio práctico para crear una aplicación Android completa que gestione un negocio de paseos de mascotas. Podrás registrar cada paseo, calcular tarifas en pesos chilenos y llevar la cuenta de tus ingresos y clientes.
