@@ -6,6 +6,7 @@ import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Bundle
 import android.os.Environment
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
@@ -35,6 +36,7 @@ import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Pets
 import androidx.compose.material.icons.filled.PhotoCamera
+import androidx.compose.material.icons.filled.PictureAsPdf
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.AssistChip
 import androidx.compose.material3.AssistChipDefaults
@@ -60,6 +62,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -84,6 +87,8 @@ import com.example.deflatam_pruebafinal.repositorio.RepositorioPaseosMascotas
 import com.example.deflatam_pruebafinal.ui.theme.DefLatam_pruebaFinalTheme
 import com.example.deflatam_pruebafinal.utilidades.FormatoDinero
 import com.example.deflatam_pruebafinal.utilidades.FormatoFecha
+import com.example.deflatam_pruebafinal.utilidades.GeneradorPdf
+import kotlinx.coroutines.launch
 import java.io.File
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -122,11 +127,13 @@ fun AplicacionPaseosMascotas() {
     val baseDeDatos = BaseDeDatosPaseos.obtenerBaseDeDatos(context)
     val repositorio = RepositorioPaseosMascotas(baseDeDatos.accesoDatosPaseos())
     val viewModel: ModeloVistaPaseos = viewModel { ModeloVistaPaseos(repositorio) }
+    val coroutineScope = rememberCoroutineScope() // Para lanzar la generación del PDF
 
     // Estado para mostrar/ocultar el formulario
     var mostrandoFormulario by remember { mutableStateOf(false) }
     // Obtener el término de búsqueda actual del ViewModel
     val terminoBusqueda by viewModel.terminoBusqueda.collectAsState()
+    val paseosFiltrados by viewModel.paseos.collectAsState() // Para obtener la lista actual de paseos
 
     Scaffold(
         topBar = {
@@ -169,6 +176,38 @@ fun AplicacionPaseosMascotas() {
                 leadingIcon = { Icon(Icons.Default.Search, contentDescription = "Buscar") }
             )
 
+            Spacer(modifier = Modifier.height(8.dp)) // Espacio antes del botón de PDF
+
+            // Botón para generar PDF
+            Button(
+                onClick = {
+                    coroutineScope.launch { // Usar coroutineScope para la operación de archivo
+                        val listaParaPdf = paseosFiltrados // Usar la lista filtrada o todos los paseos
+                        if (listaParaPdf.isNotEmpty()) {
+                            val nombreArchivo = "ReportePaseos_${System.currentTimeMillis()}.pdf"
+                            val archivoPdf = GeneradorPdf.generarPdfPaseos(context, listaParaPdf, nombreArchivo)
+
+                            if (archivoPdf != null) {
+                                Log.d("PDF", "PDF generado en: ${archivoPdf.absolutePath}")
+                                GeneradorPdf.abrirPdf(context, archivoPdf) // Llamar a la función para abrir
+                            } else {
+                                Log.e("PDF", "Error al generar el PDF")
+                                // Mostrar algún mensaje al usuario, e.g., un Toast
+                            }
+                        } else {
+                            Log.d("PDF", "No hay datos para generar el PDF")
+                            // Mostrar algún mensaje al usuario
+                        }
+                    }
+                },
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Icon(Icons.Filled.PictureAsPdf, contentDescription = "Generar PDF")
+                Spacer(modifier = Modifier.width(8.dp))
+                Text("Generar Reporte PDF")
+            }
+
+
             Spacer(modifier = Modifier.height(16.dp))
 
             if (mostrandoFormulario) {
@@ -179,7 +218,7 @@ fun AplicacionPaseosMascotas() {
                 )
             } else {
                 // Mostrar lista de todos los paseos (ya se filtrará automáticamente por el ViewModel)
-                ListaDePaseos(viewModel)
+                ListaDePaseos(viewModel, context) // Pasamos context aquí
             }
         }
     }
@@ -469,76 +508,25 @@ fun FormularioNuevoPaseo(
     }
 }
 
+
 // Lista de paseos
 @Composable
-fun ListaDePaseos(viewModel: ModeloVistaPaseos) {
-    val paseos by viewModel.paseos.collectAsState()
-    val terminoBusqueda by viewModel.terminoBusqueda.collectAsState()
-    val context = LocalContext.current
+fun ListaDePaseos(viewModel: ModeloVistaPaseos, context: Context) {
+    val paseos by viewModel.paseos.collectAsState() // Ya filtrados
 
     if (paseos.isEmpty()) {
-        Card(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp),
-            elevation = CardDefaults.cardElevation(4.dp)
-        ) {
-            Column(
-                modifier = Modifier
-                    .padding(16.dp)
-                    .fillMaxWidth(),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.Center
-            ) {
-                Icon(
-                    Icons.Default.Pets,
-                    contentDescription = "Sin paseos",
-                    modifier = Modifier.size(48.dp)
-                )
-                Spacer(modifier = Modifier.height(8.dp))
-                if (terminoBusqueda.isBlank()) {
-                    Text(
-                        "🐾 No hay paseos registrados todavía.",
-                        style = MaterialTheme.typography.bodyLarge
-                    )
-                    Text(
-                        "¡Anímate a agregar el primero!",
-                        style = MaterialTheme.typography.bodySmall
-                    )
-                } else {
-                    Text(
-                        "🐾 No se encontraron paseos para $terminoBusqueda",
-                        style = MaterialTheme.typography.bodyLarge
-                    )
-                    Text(
-                        "Intenta con otro término de búsqueda.",
-                        style = MaterialTheme.typography.bodySmall
-                    )
-                }
-            }
-        }
-    } else {
-        if (terminoBusqueda.isBlank()) {
-            Text(
-                "📋 Lista de Paseos",
-                style = MaterialTheme.typography.headlineMedium,
-                modifier = Modifier.padding(bottom = 8.dp)
+        Text("No hay paseos registrados o que coincidan con la búsqueda.")
+        return
+    }
+
+    LazyColumn {
+        items(paseos) { paseo ->
+            TarjetaPaseo(
+                paseo = paseo,
+                onCambiarEstadoPago = { viewModel.cambiarEstadoPago(paseo) },
+                onEliminar = { viewModel.eliminarPaseo(paseo, context) }
             )
-        } else {
-            Text(
-                "🔍 Resultados para $terminoBusqueda",
-                style = MaterialTheme.typography.headlineMedium,
-                modifier = Modifier.padding(bottom = 8.dp)
-            )
-        }
-        LazyColumn(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-            items(paseos, key = { it.id }) { paseo ->
-                TarjetaPaseo(
-                    paseo = paseo,
-                    onCambiarEstadoPago = { viewModel.cambiarEstadoPago(paseo) },
-                    onEliminar = { viewModel.eliminarPaseo(paseo, context) }
-                )
-            }
+            Spacer(modifier = Modifier.height(8.dp))
         }
     }
 }
@@ -613,7 +601,7 @@ fun TarjetaPaseo(
                             overflow = TextOverflow.Ellipsis
                         )
                         Text(
-                            text = "📅 ${FormatoFecha(paseo.fecha)}",
+                            text = "📅 ${FormatoFecha(paseo.fecha)}", // Asegúrate que FormatoFecha.dateAStringAmigable exista y funcione
                             style = MaterialTheme.typography.bodySmall,
                             color = Color(0xFF2f3030)
                         )
