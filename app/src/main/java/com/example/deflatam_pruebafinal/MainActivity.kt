@@ -2,11 +2,13 @@ package com.example.deflatam_pruebafinal
 
 import android.Manifest
 import android.content.Context
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Bundle
 import android.os.Environment
 import android.util.Log
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
@@ -34,9 +36,9 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.PictureAsPdf
 import androidx.compose.material.icons.filled.Pets
 import androidx.compose.material.icons.filled.PhotoCamera
-import androidx.compose.material.icons.filled.PictureAsPdf
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.AssistChip
 import androidx.compose.material3.AssistChipDefaults
@@ -86,7 +88,7 @@ import com.example.deflatam_pruebafinal.modelovista.ModeloVistaPaseos
 import com.example.deflatam_pruebafinal.repositorio.RepositorioPaseosMascotas
 import com.example.deflatam_pruebafinal.ui.theme.DefLatam_pruebaFinalTheme
 import com.example.deflatam_pruebafinal.utilidades.FormatoDinero
-import com.example.deflatam_pruebafinal.utilidades.FormatoFecha
+import com.example.deflatam_pruebafinal.utilidades.FormatoFecha // Asegúrate que la utilidad FormatoFecha esté correcta
 import com.example.deflatam_pruebafinal.utilidades.GeneradorPdf
 import kotlinx.coroutines.launch
 import java.io.File
@@ -196,7 +198,7 @@ fun AplicacionPaseosMascotas() {
                             }
                         } else {
                             Log.d("PDF", "No hay datos para generar el PDF")
-                            // Mostrar algún mensaje al usuario
+                            Toast.makeText(context, "No hay datos para generar el PDF", Toast.LENGTH_SHORT).show()
                         }
                     }
                 },
@@ -218,7 +220,7 @@ fun AplicacionPaseosMascotas() {
                 )
             } else {
                 // Mostrar lista de todos los paseos (ya se filtrará automáticamente por el ViewModel)
-                ListaDePaseos(viewModel, context) // Pasamos context aquí
+                ListaDePaseos(viewModel)
             }
         }
     }
@@ -508,25 +510,76 @@ fun FormularioNuevoPaseo(
     }
 }
 
-
 // Lista de paseos
 @Composable
-fun ListaDePaseos(viewModel: ModeloVistaPaseos, context: Context) {
-    val paseos by viewModel.paseos.collectAsState() // Ya filtrados
+fun ListaDePaseos(viewModel: ModeloVistaPaseos) {
+    val paseos by viewModel.paseos.collectAsState()
+    val terminoBusqueda by viewModel.terminoBusqueda.collectAsState()
+    val context = LocalContext.current
 
     if (paseos.isEmpty()) {
-        Text("No hay paseos registrados o que coincidan con la búsqueda.")
-        return
-    }
-
-    LazyColumn {
-        items(paseos) { paseo ->
-            TarjetaPaseo(
-                paseo = paseo,
-                onCambiarEstadoPago = { viewModel.cambiarEstadoPago(paseo) },
-                onEliminar = { viewModel.eliminarPaseo(paseo, context) }
+        Card(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
+            elevation = CardDefaults.cardElevation(4.dp)
+        ) {
+            Column(
+                modifier = Modifier
+                    .padding(16.dp)
+                    .fillMaxWidth(),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center
+            ) {
+                Icon(
+                    Icons.Default.Pets,
+                    contentDescription = "Sin paseos",
+                    modifier = Modifier.size(48.dp)
+                )
+                Spacer(modifier = Modifier.height(8.dp))
+                if (terminoBusqueda.isBlank()) {
+                    Text(
+                        "🐾 No hay paseos registrados todavía.",
+                        style = MaterialTheme.typography.bodyLarge
+                    )
+                    Text(
+                        "¡Anímate a agregar el primero!",
+                        style = MaterialTheme.typography.bodySmall
+                    )
+                } else {
+                    Text(
+                        "🐾 No se encontraron paseos para $terminoBusqueda",
+                        style = MaterialTheme.typography.bodyLarge
+                    )
+                    Text(
+                        "Intenta con otro término de búsqueda.",
+                        style = MaterialTheme.typography.bodySmall
+                    )
+                }
+            }
+        }
+    } else {
+        if (terminoBusqueda.isBlank()) {
+            Text(
+                "📋 Lista de Paseos",
+                style = MaterialTheme.typography.headlineMedium,
+                modifier = Modifier.padding(bottom = 8.dp)
             )
-            Spacer(modifier = Modifier.height(8.dp))
+        } else {
+            Text(
+                "🔍 Resultados para $terminoBusqueda",
+                style = MaterialTheme.typography.headlineMedium,
+                modifier = Modifier.padding(bottom = 8.dp)
+            )
+        }
+        LazyColumn(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            items(paseos, key = { it.id }) { paseo ->
+                TarjetaPaseo(
+                    paseo = paseo,
+                    onCambiarEstadoPago = { viewModel.cambiarEstadoPago(paseo) },
+                    onEliminar = { viewModel.eliminarPaseo(paseo, context) }
+                )
+            }
         }
     }
 }
@@ -601,7 +654,7 @@ fun TarjetaPaseo(
                             overflow = TextOverflow.Ellipsis
                         )
                         Text(
-                            text = "📅 ${FormatoFecha(paseo.fecha)}", // Asegúrate que FormatoFecha.dateAStringAmigable exista y funcione
+                            text = "📅 ${FormatoFecha(paseo.fecha)}",
                             style = MaterialTheme.typography.bodySmall,
                             color = Color(0xFF2f3030)
                         )
