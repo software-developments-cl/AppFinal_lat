@@ -2,10 +2,13 @@ package com.example.deflatam_pruebafinal
 
 import android.Manifest
 import android.content.Context
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Bundle
 import android.os.Environment
+import android.util.Log
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
@@ -33,6 +36,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.PictureAsPdf
 import androidx.compose.material.icons.filled.Pets
 import androidx.compose.material.icons.filled.PhotoCamera
 import androidx.compose.material.icons.filled.Search
@@ -60,6 +64,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -83,7 +88,9 @@ import com.example.deflatam_pruebafinal.modelovista.ModeloVistaPaseos
 import com.example.deflatam_pruebafinal.repositorio.RepositorioPaseosMascotas
 import com.example.deflatam_pruebafinal.ui.theme.DefLatam_pruebaFinalTheme
 import com.example.deflatam_pruebafinal.utilidades.FormatoDinero
-import com.example.deflatam_pruebafinal.utilidades.FormatoFecha
+import com.example.deflatam_pruebafinal.utilidades.FormatoFecha // Asegúrate que la utilidad FormatoFecha esté correcta
+import com.example.deflatam_pruebafinal.utilidades.GeneradorPdf
+import kotlinx.coroutines.launch
 import java.io.File
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -122,11 +129,13 @@ fun AplicacionPaseosMascotas() {
     val baseDeDatos = BaseDeDatosPaseos.obtenerBaseDeDatos(context)
     val repositorio = RepositorioPaseosMascotas(baseDeDatos.accesoDatosPaseos())
     val viewModel: ModeloVistaPaseos = viewModel { ModeloVistaPaseos(repositorio) }
+    val coroutineScope = rememberCoroutineScope() // Para lanzar la generación del PDF
 
     // Estado para mostrar/ocultar el formulario
     var mostrandoFormulario by remember { mutableStateOf(false) }
     // Obtener el término de búsqueda actual del ViewModel
     val terminoBusqueda by viewModel.terminoBusqueda.collectAsState()
+    val paseosFiltrados by viewModel.paseos.collectAsState() // Para obtener la lista actual de paseos
 
     Scaffold(
         topBar = {
@@ -168,6 +177,38 @@ fun AplicacionPaseosMascotas() {
                 singleLine = true,
                 leadingIcon = { Icon(Icons.Default.Search, contentDescription = "Buscar") }
             )
+
+            Spacer(modifier = Modifier.height(8.dp)) // Espacio antes del botón de PDF
+
+            // Botón para generar PDF
+            Button(
+                onClick = {
+                    coroutineScope.launch { // Usar coroutineScope para la operación de archivo
+                        val listaParaPdf = paseosFiltrados // Usar la lista filtrada o todos los paseos
+                        if (listaParaPdf.isNotEmpty()) {
+                            val nombreArchivo = "ReportePaseos_${System.currentTimeMillis()}.pdf"
+                            val archivoPdf = GeneradorPdf.generarPdfPaseos(context, listaParaPdf, nombreArchivo)
+
+                            if (archivoPdf != null) {
+                                Log.d("PDF", "PDF generado en: ${archivoPdf.absolutePath}")
+                                GeneradorPdf.abrirPdf(context, archivoPdf) // Llamar a la función para abrir
+                            } else {
+                                Log.e("PDF", "Error al generar el PDF")
+                                // Mostrar algún mensaje al usuario, e.g., un Toast
+                            }
+                        } else {
+                            Log.d("PDF", "No hay datos para generar el PDF")
+                            Toast.makeText(context, "No hay datos para generar el PDF", Toast.LENGTH_SHORT).show()
+                        }
+                    }
+                },
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Icon(Icons.Filled.PictureAsPdf, contentDescription = "Generar PDF")
+                Spacer(modifier = Modifier.width(8.dp))
+                Text("Generar Reporte PDF")
+            }
+
 
             Spacer(modifier = Modifier.height(16.dp))
 

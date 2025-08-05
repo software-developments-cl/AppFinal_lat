@@ -83,4 +83,8 @@ dependencies {
 
     // Coil para Jetpack Compose
     implementation("io.coil-kt.coil3:coil-compose:3.3.0")
+
+    // iText7 para PDF
+    implementation("com.itextpdf:itext7-core:7.2.5")
+    implementation("org.slf4j:slf4j-android:1.7.36") // iText7 requiere un logger
 }
