@@ -20,5 +20,7 @@ data class EntidadPaseoMascota(
     val montoTotal: Double, // Total a cobrar (horas × tarifa)
     val estaPagado: Boolean, // ¿Ya nos pagaron? true/false
     val fecha: Date, // Cuándo fue el paseo
-    val notas: String = "" // Comentarios extra
+    val notas: String = "", // Comentarios extra
+    val fotoMascotaUri: String? = null // URI de la foto de la mascota
+
 )

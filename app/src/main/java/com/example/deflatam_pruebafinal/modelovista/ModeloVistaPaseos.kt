@@ -12,11 +12,11 @@ import com.example.deflatam_pruebafinal.datos.EntidadPaseoMascota
 import com.example.deflatam_pruebafinal.repositorio.RepositorioPaseosMascotas
 import com.example.deflatam_pruebafinal.utilidades.NotificationReceiver
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.combine // Asegúrate de tener esta importación
-import kotlinx.coroutines.flow.SharingStarted // Asegúrate de tener esta importación
-import kotlinx.coroutines.flow.stateIn // Asegúrate de tener esta importación
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import java.util.Calendar
 import java.util.Date
@@ -72,6 +72,9 @@ class ModeloVistaPaseos(private val repositorio: RepositorioPaseosMascotas) : Vi
 
     private val _fechaHoraPaseo = MutableStateFlow<Date>(Date())
     val fechaHoraPaseo: StateFlow<Date> = _fechaHoraPaseo.asStateFlow()
+
+    private val _fotoMascotaUri = MutableStateFlow<String?>(null)
+    val fotoMascotaUri: StateFlow<String?> = _fotoMascotaUri.asStateFlow()
 
     init {
         // Cuando se crea el ViewModel, cargar todos los datos
@@ -137,6 +140,10 @@ class ModeloVistaPaseos(private val repositorio: RepositorioPaseosMascotas) : Vi
         _notas.value = notas
     }
 
+    fun actualizarFotoMascotaUri(uri: String?) {
+        _fotoMascotaUri.value = uri
+    }
+
     fun calcularMontoTotal(): Double {
         val horas = _duracionHoras.value.toDoubleOrNull() ?: 0.0
         val tarifa = _tarifaPorHora.value.toDoubleOrNull() ?: 0.0
@@ -158,7 +165,8 @@ class ModeloVistaPaseos(private val repositorio: RepositorioPaseosMascotas) : Vi
                 montoTotal = total,
                 estaPagado = false,
                 fecha = _fechaHoraPaseo.value,
-                notas = _notas.value
+                notas = _notas.value,
+                fotoMascotaUri = _fotoMascotaUri.value
             )
 
             val paseoGuardado = repositorio.agregarPaseo(nuevoPaseo)
@@ -261,6 +269,7 @@ class ModeloVistaPaseos(private val repositorio: RepositorioPaseosMascotas) : Vi
         _tarifaPorHora.value = ""
         _notas.value = ""
         _fechaHoraPaseo.value = Date() // Resetear la fecha también
+        _fotoMascotaUri.value = null
     }
 
     fun formularioEsValido(): Boolean {
